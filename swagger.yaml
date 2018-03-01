@@ -1,0 +1,287 @@
+swagger: "2.0"
+info:
+  description: "Sample API for internal blog"
+  version: "0.1.0"
+  title: "Swagger Petstore"
+  contact:
+    email: "someone@somewhere.io"
+  license:
+    name: "MIT"
+    url: "https://opensource.org/licenses/MIT"
+host: "somewhere.io"
+basePath: "/v1"
+tags:
+- name: "login"
+  description: "Login using github oauth"
+- name: "post"
+  description: "Operations about posts"
+schemes:
+- "https"
+paths:
+  /login:
+    post:
+      tags:
+      - "login"
+      summary: "Login using github oauth access token"
+      description: ""
+      operationId: "loginAccessToken"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "login successful"
+        401:
+          description: "login not successful"
+
+  /posts/{postId}:
+    get:
+      tags: 
+      - "post"
+      summary: "Get specific post"
+      description: "Get specific post and mark as read for user"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: true
+        type: "string"
+      - name: "postId"
+        in: "path"
+        description: "Id of post to view"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Post"
+          schema:
+            $ref: "#/definitions/Post"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+        500:
+          description: "Internal error"
+
+  /posts/{postId}/markViewed:
+    post:
+      tags: 
+      - "post"
+      summary: "Mark post as viewed by user"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: true
+        type: "string"
+      - name: "postId"
+        in: "path"
+        description: "Id of post to view"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "OK"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+        500:
+          description: "Internal error"
+
+  /posts/{postId}/viewers:
+    get:
+      tags: 
+      - "post"
+      summary: "Get viewers of a post"
+      description: "Get post viewers"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: true
+        type: "string"
+      - name: "postId"
+        in: "path"
+        description: "Id of post to view"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Viewers"
+          schema:
+            $ref: "#/definitions/UsersList"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+        500:
+          description: "Internal error"
+
+
+  /posts/{postId}/stats:
+    get:
+      tags: 
+      - "post"
+      summary: "Get stats about a post"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: true
+        type: "string"
+      - name: "postId"
+        in: "path"
+        description: "Id of post to view"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "PostStats"
+          schema:
+            $ref: "#/definitions/PostStats"
+        401:
+          description: "Unauthorized"
+        404:
+          description: "Not found"
+        500:
+          description: "Internal error"
+
+
+  /posts:
+    post:
+      tags:
+      - "post"
+      summary: "Create a new post"
+      operationId: "postCreate"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Post to be created"
+        required: true
+        schema:
+          $ref: "#/definitions/Post"
+      consumes: 
+        - "application/json"
+      responses:
+        200:
+          description: "Post created"
+          schema:
+            $ref: "#/definitions/PostLink"
+        401:
+          description: "Unauthorized"
+        400:
+          description: "Invalid input"
+        500:
+          description: "Internal error"
+    get:
+      tags:
+      - "post"
+      summary: "Get posts for user"
+      description: "Get the posts for the user based on query params.  By default it will return the latest 20 posts for the user based on groups and posts destined for the user"
+      parameters: 
+      - name: "groupId"
+        in: "query"
+        description: "Get posts for specific group"
+        required: false
+        type: string
+      - name: "authorId"
+        in: "query"
+        description: "Get posts for specific author"
+        required: false
+        type: string
+      responses:
+        200:
+          description: OK
+
+definitions:
+  Post:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "generated"
+        example: "51bf03e0-1d77-11e8-b467-0ed5f89f718b"
+      content:
+        type: "string"
+        description: "markdown string of post content"
+        example: "My awesome post"
+      author:
+        type: "string"
+        description: "userId"
+        example: "66f99a4a-1d77-11e8-b467-0ed5f89f718b"
+      destinationType:
+        type: "string"
+        enum:
+        - "user"
+        - "group"
+        - "all"
+        example: "user"
+      destinationId:
+        type: "string"
+        example: "987864ca-1d77-11e8-b467-0ed5f89f718b"
+      timestamp:
+        type: "number"
+        description: "unix epoch in seconds"
+        example: 1519925857
+  PostStats:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      timestamp:
+        type: "number"
+        description: "unix epoch in seconds"   
+        example: 1519925857
+      viewers:
+        type: number
+        example: 33
+      views:
+        type: number
+        example: 
+      _links:
+        type: "object"
+        properties:
+          self: 
+            type: "object"
+            properties:
+              href:
+                type: "string"
+                example: "/posts/123"
+  PostLink:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      timestamp:
+        type: "number"
+        description: "unix epoch in seconds"   
+        example: 1519925857
+      _links:
+        type: "object"
+        properties:
+          self: 
+            type: "object"
+            properties:
+              href:
+                type: "string"
+                example: "/posts/123"
+
+  User:
+    type: object
+    properties:
+      id:
+        type: "string"
+        example: "aabb6ac6-1d7f-11e8-b467-0ed5f89f718b"
+      name: 
+        type: "string"
+        example: "jdoe"
+  UsersList:
+    type: array
+    items:
+      $ref: "#/definitions/User"
+      

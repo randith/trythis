@@ -1,0 +1,11 @@
+server:
+  maxThreads: 1024
+  minThreads: 8
+  applicationConnectors:
+   - type: http
+
+logging:
+  level: ${GLOBAL_LOG_LEVEL:-INFO}
+  loggers:
+    "io.awesome": ${AWESOME_LOG_LEVEL:-DEBUG}
+
