@@ -32,3 +32,71 @@ Another part of the problem that might be a bit different is the timeseries base
 
 Looking forward another interesting possibility would be to use ElasticSearch and store the content (markdown blogs themselves) in a different store.  This would allow the metadata DB that poweries queries to be much smaller and much more eficient.  Also, it allows the api to offload most of the network throughput to something like S3.
  
+ 
+## Java Api
+
+In order to have some code for this coding project I quickly put together a starter api that has 3 endpoints (create post, get posts, and get post) back by an in memory PostService.
+
+The java api is a dropwizard service that has some tests, reasonable build and test cycle powered by maven, and an integration test powered by RestAssured.
+
+I ran it in my IDE.  But it can be run via:
+* ```cd PATH/TO/REPO/inboxapi```
+* ```mvn package```
+* ```java -jar target/inboxapi.jar server app/config.yaml```
+
+then you can do things like
+
+```
+curl -X POST "http://localhost:8080/v1/posts" -H "accept: application/json" -H "Authorization: 12456" -H "Content-Type: application/json" -d "{ \"id\": \"AAA51bf03e0-1d77-11e8-b467-0ed5f89f718b\", \"content\": \"My awesome post\", \"authorId\": \"66f99a4a-1d77-11e8-b467-0ed5f89f718b\", \"destinationType\": \"user\", \"destinationId\": \"987864ca-1d77-11e8-b467-0ed5f89f718b\", \"timestamp\": 1519925857}"  | python -m json.tool
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   371  100   130  100   241  16722  31000 --:--:-- --:--:-- --:--:-- 34428
+{
+    "id": "AAA51bf03e0-1d77-11e8-b467-0ed5f89f718b",
+    "link": "/v1/posts/AAA51bf03e0-1d77-11e8-b467-0ed5f89f718b",
+    "timestamp": 1519925857
+}
+```
+
+and 
+
+```
+curl localhost:8080/v1/posts | python -m json.tool
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   330  100   330    0     0  41777      0 --:--:-- --:--:-- --:--:-- 47142
+[
+    {
+        "id": "51bf03e0-1d77-11e8-b467-0ed5f89f718b",
+        "link": "/v1/posts/51bf03e0-1d77-11e8-b467-0ed5f89f718b",
+        "timestamp": 1519925857
+    },
+    {
+        "id": "anotherone",
+        "link": "/v1/posts/anotherone",
+        "timestamp": 1519925857
+    },
+    {
+        "id": "AAA51bf03e0-1d77-11e8-b467-0ed5f89f718b",
+        "link": "/v1/posts/AAA51bf03e0-1d77-11e8-b467-0ed5f89f718b",
+        "timestamp": 1519925857
+    }
+]
+```
+
+and
+
+```
+curl localhost:8080/v1/posts/anotherone | python -m json.tool
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   200  100   200    0     0  13825      0 --:--:-- --:--:-- --:--:-- 14285
+{
+    "authorId": "66f99a4a-1d77-11e8-b467-0ed5f89f718b",
+    "content": "My awesome post",
+    "destinationId": "987864ca-1d77-11e8-b467-0ed5f89f718b",
+    "destinationType": "user",
+    "id": "anotherone",
+    "timestamp": 1519925857
+}
+```

@@ -8,7 +8,7 @@ info:
   license:
     name: "MIT"
     url: "https://opensource.org/licenses/MIT"
-host: "somewhere.io"
+host: "localhost:8080"
 basePath: "/v1"
 tags:
 - name: "login"
@@ -16,7 +16,7 @@ tags:
 - name: "post"
   description: "Operations about posts"
 schemes:
-- "https"
+- "http"
 paths:
   /login:
     post:
@@ -210,7 +210,7 @@ definitions:
         type: "string"
         description: "markdown string of post content"
         example: "My awesome post"
-      author:
+      authorId:
         type: "string"
         description: "userId"
         example: "66f99a4a-1d77-11e8-b467-0ed5f89f718b"
